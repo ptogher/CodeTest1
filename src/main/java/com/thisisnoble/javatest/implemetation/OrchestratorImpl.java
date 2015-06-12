@@ -91,14 +91,12 @@ public class OrchestratorImpl implements Orchestrator {
 		}
 
 		public void incrementProcessingCount() {
-			int count = processingCount.incrementAndGet();
-			System.out.println("Processing count increment. Now at " + count + " for target event " + targetEvent.getId() );
+			processingCount.incrementAndGet();
 		}
 		
 		public void decrementProcessingCount() {
 			//When the count reaches 0, then chain is complete, so publish.
 			int count = processingCount.decrementAndGet();
-			System.out.println("Processing count decrement. Now at " + count + " for target event " + targetEvent.getId() );
 			if(count == 0) {
 				publisher.publish(targetEvent);
 			}
