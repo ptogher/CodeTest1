@@ -1,0 +1,35 @@
+package com.thisisnoble.javatest.processors;
+
+import static com.thisisnoble.javatest.util.TestIdGenerator.marginEventId;
+
+import com.thisisnoble.javatest.Event;
+import com.thisisnoble.javatest.Processor;
+import com.thisisnoble.javatest.events.MarginEvent;
+import com.thisisnoble.javatest.events.ShippingEvent;
+import com.thisisnoble.javatest.events.TradeEvent;
+
+public class MarginProcessor implements Processor {
+
+    @Override
+    public boolean interestedIn(Event event) {
+        return event instanceof TradeEvent || event instanceof ShippingEvent;
+    }
+
+    @Override
+    public Event process(final Event event) {
+        String parId = event.getId();
+        if (event instanceof TradeEvent)
+            return new MarginEvent(marginEventId(parId), parId, calculateTradeMargin(event));
+        else if (event instanceof ShippingEvent)
+            return new MarginEvent(marginEventId(parId), parId, calculateShippingMargin(event));
+        throw new IllegalArgumentException("unknown event for margin calculation " + event);
+    }
+
+    private double calculateShippingMargin(Event se) {
+        return ((ShippingEvent) se).getShippingCost() * 0.01;
+    }
+
+    private double calculateTradeMargin(Event te) {
+        return ((TradeEvent) te).getNotional() * 0.01;
+    }
+}
